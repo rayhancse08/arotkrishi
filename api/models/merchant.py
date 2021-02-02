@@ -36,3 +36,6 @@ class MerchantPermission(models.Model):
     delete_permission = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.user.profile.name
