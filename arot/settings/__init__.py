@@ -6,4 +6,5 @@ from .components.cors import *
 from .components.database import *
 from .components.development import *
 from .components.misc import *
+from .components.rest import *
 from .paths import *

@@ -12,5 +12,5 @@ class OrderItemInline(admin.StackedInline):
 class OrderAdmin(GenericModelAdmin):
     inlines = (OrderItemInline,)
     list_display = (
-        'order_no', 'order_date', 'delivery_date', 'buyer', 'created_by', 'total_amount')
+        'order_no', 'order_date', 'delivery_date', 'buyer', 'created_by', 'total_amount', 'created')
     search_fields = ('order_no',)
