@@ -20,3 +20,6 @@ class UserProfile(models.Model):
     address = models.CharField(null=True, blank=True, max_length=255)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.name
