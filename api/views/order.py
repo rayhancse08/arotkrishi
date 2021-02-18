@@ -65,6 +65,11 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
     created_by = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
+    total_order = serializers.SerializerMethodField()
+
+    # @staticmethod
+    def get_total_order(self, obj):
+        return self.context.get("user").merchant_user_permissions.first().merchant.orders.count()
 
     @staticmethod
     def create_update_order_items(order_items_data, order):
@@ -94,10 +99,7 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
         except ValidationError as e:
             raise serializers.ValidationError({"error": [e.message]})
         self.create_update_order_items(order_items_data, order)
-        total_order = Order.objects.filter(buyer=merchant).count()
-        validated_data['total_order'] = total_order
-        return super(OrderCreateUpdateSerializer, self).create(validated_data)
-        # return Response({'order': OrderSerializer(order).data, 'total_order': total_order})
+        return order
 
     class Meta:
         model = Order
@@ -110,6 +112,7 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
             # 'buyer',
             'created_by',
             'order_items',
+            'total_order'
 
         )
 
