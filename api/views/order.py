@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import OrderItem, Order
+from api.models import OrderItem, Order,Merchant
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 from api.views.utils import MultiSerializerMixin
@@ -10,6 +10,13 @@ from rest_framework.parsers import JSONParser
 # from rest_framework import generics
 # from rest_framework.utils import model_meta
 
+class MerchantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Merchant
+        fields = (
+            'id',
+            'name',
+        )
 
 class OrderItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -101,6 +108,7 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, required=False)
+    buyer = MerchantSerializer(many=False)
 
     class Meta:
         model = Order
