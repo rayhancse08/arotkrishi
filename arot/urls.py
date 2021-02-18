@@ -23,8 +23,44 @@ class HomeView(TemplateView):
     template_name = 'index.html'
 
 
+class AboutView(TemplateView):
+    template_name = 'index.html'
+
+
+class GrowersView(TemplateView):
+    template_name = 'index.html'
+
+
+class BuyersView(TemplateView):
+    template_name = 'index.html'
+
+
+class WhyArotView(TemplateView):
+    template_name = 'index.html'
+
+
+class TeamView(TemplateView):
+    template_name = 'index.html'
+
+
+class ContactView(TemplateView):
+    template_name = 'index.html'
+
+
+class LoginView(TemplateView):
+    template_name = 'index.html'
+
+
 urlpatterns = [
     path('', HomeView.as_view()),
+    path('about/', AboutView.as_view()),
+    path('growers/', AboutView.as_view()),
+    path('buyers/', AboutView.as_view()),
+    path('why-arrot/', WhyArotView.as_view()),
+    path('team/', TeamView.as_view()),
+    path('contact/', ContactView.as_view()),
+    path('login/', LoginView.as_view()),
+
     path('admin/', admin.site.urls),
     path('api/', include(api_urls)),
 ]
