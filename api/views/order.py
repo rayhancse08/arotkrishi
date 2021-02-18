@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import OrderItem, Order,Merchant
+from api.models import OrderItem, Order, Merchant
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 from api.views.utils import MultiSerializerMixin
@@ -9,6 +9,8 @@ from api.views.utils import MultipartJsonParser
 from rest_framework.parsers import JSONParser
 # from rest_framework import generics
 # from rest_framework.utils import model_meta
+from rest_framework.response import Response
+
 
 class MerchantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,6 +19,7 @@ class MerchantSerializer(serializers.ModelSerializer):
             'id',
             'name',
         )
+
 
 class OrderItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -83,14 +86,16 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         order_items_data = validated_data.pop('order_items')
         order = Order(**validated_data)
-        order.buyer = self.context.get("user").merchant_user_permissions.first().merchant
+        merchant = self.context.get("user").merchant_user_permissions.first().merchant
+        order.buyer = merchant
         try:
             order.clean()
             order.save()
         except ValidationError as e:
             raise serializers.ValidationError({"error": [e.message]})
         self.create_update_order_items(order_items_data, order)
-        return order
+        total_order = Order.objects.filter(buyer=merchant).count()
+        return Response({'order': order, 'total_order': total_order})
 
     class Meta:
         model = Order
@@ -99,6 +104,7 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
             'id',
             'order_date',
             'delivery_date',
+            'status',
             # 'buyer',
             'created_by',
             'order_items',
@@ -118,6 +124,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'delivery_date',
             'buyer',
             'total_amount',
+            'status',
             'created_by',
             'order_items',
             'created'
@@ -155,4 +162,3 @@ class OrderViewSet(
         'create': OrderCreateUpdateSerializer,
         'update': OrderCreateUpdateSerializer,
     }
-

@@ -6,10 +6,16 @@ import uuid
 
 
 class Order(models.Model):
+    ORDER_STATUS = ((1, 'Pending'),
+                    (2, 'Confirmed'),
+                    (3, 'Processing'),
+                    (4, 'Shipping'),
+                    (5, 'Delivered'))
     order_no = models.CharField(max_length=20, null=True, blank=True)
     order_date = models.DateField()
     delivery_date = models.DateField()
     buyer = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='orders')
+    status = models.IntegerField(choices=ORDER_STATUS, default=1)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     total_amount = models.DecimalField(
         null=True,
