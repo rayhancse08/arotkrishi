@@ -95,7 +95,9 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"error": [e.message]})
         self.create_update_order_items(order_items_data, order)
         total_order = Order.objects.filter(buyer=merchant).count()
-        return Response({'order': OrderSerializer(order).data, 'total_order': total_order})
+        validated_data['total_order'] = total_order
+        return super(OrderCreateUpdateSerializer, self).create(validated_data)
+        # return Response({'order': OrderSerializer(order).data, 'total_order': total_order})
 
     class Meta:
         model = Order
