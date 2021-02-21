@@ -51,6 +51,10 @@ class LoginView(TemplateView):
     template_name = 'index.html'
 
 
+class OrderView(TemplateView):
+    template_name = 'index.html'
+
+
 urlpatterns = [
     path('', HomeView.as_view()),
     path('about/', AboutView.as_view()),
@@ -60,6 +64,7 @@ urlpatterns = [
     path('team/', TeamView.as_view()),
     path('contact/', ContactView.as_view()),
     path('login/', LoginView.as_view()),
+    path('order', OrderView.as_view()),
 
     path('admin/', admin.site.urls),
     path('api/', include(api_urls)),
