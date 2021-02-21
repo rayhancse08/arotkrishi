@@ -3,7 +3,7 @@ from django.db import models
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', primary_key=True)
     name = models.CharField(max_length=255, null=True)
     phone_number = models.CharField(
         # help_text="eg: +8801*******, +88 is important",
