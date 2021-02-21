@@ -10,7 +10,7 @@ from api.views.profile import UserProfileSerializer,UserSerializer
 from api.models import UserProfile,Merchant,MerchantPermission
 # from rest_framework import mixins
 # from rest_framework.viewsets import GenericViewSet
-
+from django.views.decorators.csrf import csrf_exempt
 
 class UserPasswordSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=50)
@@ -49,7 +49,7 @@ class MerchantPermissionSerializer(serializers.ModelSerializer):
 class LoginView(APIView):
     permission_classes = []
     serializer_class = UserPasswordSerializer
-
+    @csrf_exempt
     def post(self, request):
         phone_number = request.data.get('phone_number')
         if not phone_number:

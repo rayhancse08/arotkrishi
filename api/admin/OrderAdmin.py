@@ -3,7 +3,7 @@ from django.contrib import admin
 from api import models
 
 
-class OrderItemInline(admin.StackedInline):
+class OrderItemInline(admin.TabularInline):
     model = models.OrderItem
     # form = OrderFlavorInlineForm
     extra = 0
