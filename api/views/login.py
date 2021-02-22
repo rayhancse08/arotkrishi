@@ -6,11 +6,13 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from api.views.profile import UserProfileSerializer,UserSerializer
-from api.models import UserProfile,Merchant,MerchantPermission
+from api.views.profile import UserProfileSerializer, UserSerializer
+from api.models import UserProfile, Merchant, MerchantPermission
 # from rest_framework import mixins
 # from rest_framework.viewsets import GenericViewSet
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+
 
 class UserPasswordSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=50)
@@ -46,10 +48,18 @@ class MerchantPermissionSerializer(serializers.ModelSerializer):
         )
 
 
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+
+    def enforce_csrf(self, request):
+        return  # To not perform the csrf check previously happening
+
+
 class LoginView(APIView):
     permission_classes = []
+    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
     serializer_class = UserPasswordSerializer
-    @csrf_exempt
+
+    # @csrf_exempt
     def post(self, request):
         phone_number = request.data.get('phone_number')
         if not phone_number:
@@ -87,7 +97,6 @@ class LogoutView(APIView):
         if Token.objects.filter(user=request.user).exists():
             request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK)
-
 
 # class StoreViewSet(GenericViewSet,
 #                    mixins.ListModelMixin,
