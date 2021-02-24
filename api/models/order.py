@@ -6,11 +6,13 @@ import uuid
 
 
 class Order(models.Model):
-    ORDER_STATUS = ((1, 'Pending'),
-                    (2, 'Confirmed'),
-                    (3, 'Processing'),
-                    (4, 'Shipping'),
-                    (5, 'Delivered'))
+    ORDER_STATUS = ((1, 'Proposed'),
+                    (2, 'Pending'),
+                    (3, 'Cancelled'),
+                    (4, 'Confirmed'),
+                    (5, 'Processing'),
+                    (6, 'Shipping'),
+                    (7, 'Delivered'))
     order_no = models.CharField(max_length=20, null=True, blank=True)
     order_date = models.DateField()
     delivery_date = models.DateField()
@@ -22,6 +24,8 @@ class Order(models.Model):
         blank=True,
         max_digits=10,
         decimal_places=2, )
+
+    note = models.CharField(max_length=200, null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True, null=True)

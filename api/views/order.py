@@ -11,6 +11,7 @@ from rest_framework.parsers import JSONParser
 # from rest_framework.utils import model_meta
 from rest_framework.response import Response
 from rest_framework.utils import model_meta
+from rest_framework.decorators import api_view
 
 
 class MerchantSerializer(serializers.ModelSerializer):
@@ -187,3 +188,94 @@ class OrderViewSet(
         'create': OrderCreateUpdateSerializer,
         'update': OrderCreateUpdateSerializer,
     }
+
+
+@api_view(['PUT'])
+def cancel_order(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+
+        # if not order.is_order_cancel_time_left():
+        #     raise CancellationTimeExpired("You can not cancel order within 24 hours of delivery time")
+
+        # if order.status_id in [CANCELLATION_PENDING, CANCELLED]:
+        #     raise AlreadyCancelledException("Order is already cancelled")
+
+        # if order.status_id not in [PENDING, PROCESSING, CONFIRMED, DELIVERY_CONFIRMED]:
+        #     raise UnauthorizedException("You can not cancel this order")
+
+        # status = OrderStatus.objects.get(id=CANCELLED)
+        order.status = 3
+        order.save()
+
+        return Response(status=200, data={
+            # "data": {
+            #     "status": OrderStatusSerializer(order.status).data
+            # },
+            "message": "Order was successfully cancelled"
+        })
+    except Order.DoesNotExist:
+        return Response(status=404, data={
+            "error": {"message": "Order does not exist"}
+        })
+    # except AlreadyCancelledException as e:
+    #     return Response(status=403, data={
+    #         "error": {"message": str(e)}
+    #     })
+    # except UnauthorizedException as e:
+    #     return Response(status=403, data={
+    #         "error": {"message": str(e)}
+    #     })
+    # except CancellationTimeExpired as e:
+    #     return Response(status=403, data={
+    #         "error": {"message": str(e)}
+    #     })
+    # except:
+    #     return Response(status=403, data={
+    #         "error": {"message": "Invalid request"}
+    #     })
+
+@api_view(['PUT'])
+def confirm_order(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+
+        # if not order.is_order_cancel_time_left():
+        #     raise CancellationTimeExpired("You can not cancel order within 24 hours of delivery time")
+
+        # if order.status_id in [CANCELLATION_PENDING, CANCELLED]:
+        #     raise AlreadyCancelledException("Order is already cancelled")
+
+        # if order.status_id not in [PENDING, PROCESSING, CONFIRMED, DELIVERY_CONFIRMED]:
+        #     raise UnauthorizedException("You can not cancel this order")
+
+        # status = OrderStatus.objects.get(id=CANCELLED)
+        order.status = 4
+        order.save()
+
+        return Response(status=200, data={
+            # "data": {
+            #     "status": OrderStatusSerializer(order.status).data
+            # },
+            "message": "Order was successfully confirmed"
+        })
+    except Order.DoesNotExist:
+        return Response(status=404, data={
+            "error": {"message": "Order does not exist"}
+        })
+    # except AlreadyCancelledException as e:
+    #     return Response(status=403, data={
+    #         "error": {"message": str(e)}
+    #     })
+    # except UnauthorizedException as e:
+    #     return Response(status=403, data={
+    #         "error": {"message": str(e)}
+    #     })
+    # except CancellationTimeExpired as e:
+    #     return Response(status=403, data={
+    #         "error": {"message": str(e)}
+    #     })
+    # except:
+    #     return Response(status=403, data={
+    #         "error": {"message": "Invalid request"}
+    #     })
