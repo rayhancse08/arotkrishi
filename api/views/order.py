@@ -141,6 +141,8 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, required=False)
     buyer = MerchantSerializer(many=False)
+    # status = serializers.SerializerMethodField()
+    status = serializers.CharField(source='get_status_display')
 
     class Meta:
         model = Order
@@ -234,6 +236,7 @@ def cancel_order(request, order_id):
     #     return Response(status=403, data={
     #         "error": {"message": "Invalid request"}
     #     })
+
 
 @api_view(['PUT'])
 def confirm_order(request, order_id):
