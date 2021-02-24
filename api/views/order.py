@@ -10,6 +10,7 @@ from rest_framework.parsers import JSONParser
 # from rest_framework import generics
 # from rest_framework.utils import model_meta
 from rest_framework.response import Response
+from rest_framework.utils import model_meta
 
 
 class MerchantSerializer(serializers.ModelSerializer):
@@ -100,6 +101,25 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"error": [e.message]})
         self.create_update_order_items(order_items_data, order)
         return order
+
+    def update(self, instance, validated_data):
+        if 'order_items' in validated_data:
+            order_items_data = validated_data.pop('order_items')
+            self.create_update_order_items(order_items_data, instance)
+        info = model_meta.get_field_info(instance)
+        for attr, value in validated_data.items():
+            if attr in info.relations and info.relations[attr].to_many:
+                field = getattr(instance, attr)
+                field.set(value)
+            else:
+                setattr(instance, attr, value)
+        # if not purchase.user:
+        #     purchase.user = user
+
+        instance.clean()
+        instance.save()
+
+        return instance
 
     class Meta:
         model = Order
