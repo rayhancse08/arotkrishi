@@ -75,20 +75,36 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def create_update_order_items(order_items_data, order):
-        # delete extras that are not added in the payload
-        # items_ids = [order_item.get('id') for order_item in order_items_data if order_item.get('id', None)]
-        # ProductExtra.objects.filter(product=product).exclude(id__in=extra_ids).update(
-        #     is_active=False
-        # )
-
-        # create or update extras added in the payload
+        order_item_id = []
         for order_item in order_items_data:
-            OrderItem.objects.update_or_create(
-                order=order,
-                id=order_item.get('id', None),
-                defaults=order_item
+            product = order_item.get('product', None)
+            quantity = order_item.get('quantity', None)
+            price = order_item.get('price', None)
+            unit = order_item.get('unit', None)
+            if OrderItem.objects.filter(order=order, product=product).exists():
+                order_item_instance = OrderItem.objects.filter(order=order, product=product).first()
+                order_item_instance.unit = unit
+                order_item_instance.quantity = quantity
+                order_item_instance.price = price
+                order_item_instance.save()
+                order_item_id.append(order_item_instance.id)
+            else:
+                order_item_instance = OrderItem(order=order, product=product, quantity=quantity,
+                                                price=price, unit=unit)
+                try:
+                    order_item_instance.clean()
+                    order_item_instance.save()
+                    order_item_id.append(order_item_instance.id)
+                except ValidationError as e:
+                    raise serializers.ValidationError({"error": [e.message]})
+            order.order_items.exclude(id__in=order_item_id).delete()
 
-            )
+            # OrderItem.objects.update_or_create(
+            #     order=order,
+            #     id=order_item.get('id', None),
+            #     defaults=order_item
+            #
+            # )
 
     def create(self, validated_data):
         order_items_data = validated_data.pop('order_items')
