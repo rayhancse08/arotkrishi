@@ -6,18 +6,18 @@ import uuid
 
 
 class Order(models.Model):
-    ORDER_STATUS = ((1, 'Proposed'),
-                    (2, 'Pending'),
-                    (3, 'Cancelled'),
-                    (4, 'Confirmed'),
-                    (5, 'Processing'),
-                    (6, 'Shipping'),
-                    (7, 'Delivered'))
+    ORDER_STATUS = (('Proposed', 'Proposed'),
+                    ('Pending', 'Pending'),
+                    ('Cancelled', 'Cancelled'),
+                    ('Confirmed', 'Confirmed'),
+                    ('Processing', 'Processing'),
+                    ('Shipping', 'Shipping'),
+                    ('Delivered', 'Delivered'))
     order_no = models.CharField(max_length=20, null=True, blank=True)
     order_date = models.DateField()
     delivery_date = models.DateField()
     buyer = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='orders')
-    status = models.IntegerField(choices=ORDER_STATUS, default=1)
+    status = models.CharField(choices=ORDER_STATUS, default='Proposed', max_length=20)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     total_amount = models.DecimalField(
         null=True,

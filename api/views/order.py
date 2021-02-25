@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from api.views.product import ProductSerializer
 from api.views.utils import MultipartJsonParser
 from rest_framework.parsers import JSONParser
-# from rest_framework import generics
+from rest_framework import generics
 # from rest_framework.utils import model_meta
 from rest_framework.response import Response
 from rest_framework.utils import model_meta
@@ -158,7 +158,7 @@ class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, required=False)
     buyer = MerchantSerializer(many=False)
     # status = serializers.SerializerMethodField()
-    status = serializers.CharField(source='get_status_display')
+    # status = serializers.CharField(source='get_status_display')
 
     class Meta:
         model = Order
@@ -236,22 +236,6 @@ def cancel_order(request, order_id):
         return Response(status=404, data={
             "error": {"message": "Order does not exist"}
         })
-    # except AlreadyCancelledException as e:
-    #     return Response(status=403, data={
-    #         "error": {"message": str(e)}
-    #     })
-    # except UnauthorizedException as e:
-    #     return Response(status=403, data={
-    #         "error": {"message": str(e)}
-    #     })
-    # except CancellationTimeExpired as e:
-    #     return Response(status=403, data={
-    #         "error": {"message": str(e)}
-    #     })
-    # except:
-    #     return Response(status=403, data={
-    #         "error": {"message": "Invalid request"}
-    #     })
 
 
 @api_view(['PUT'])
@@ -282,19 +266,29 @@ def confirm_order(request, order_id):
         return Response(status=404, data={
             "error": {"message": "Order does not exist"}
         })
-    # except AlreadyCancelledException as e:
-    #     return Response(status=403, data={
-    #         "error": {"message": str(e)}
-    #     })
-    # except UnauthorizedException as e:
-    #     return Response(status=403, data={
-    #         "error": {"message": str(e)}
-    #     })
-    # except CancellationTimeExpired as e:
-    #     return Response(status=403, data={
-    #         "error": {"message": str(e)}
-    #     })
-    # except:
-    #     return Response(status=403, data={
-    #         "error": {"message": "Invalid request"}
-    #     })
+
+
+class OrderSearchView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        # store = self.request.META.get('HTTP_STORE_ID', None)
+        merchant = self.request.user.merchant_user_permissions.first().merchant
+        queryset = Order.objects.filter(buyer=merchant)
+        # queryset = Order.objects.filter(store=store)
+        status = self.request.query_params.get('status', None)
+        order_from_date = self.request.query_params.get('order_from_date', None)
+        order_to_date = self.request.query_params.get('order_to_date', None)
+        delivery_from_date = self.request.query_params.get('order_from_date', None)
+        delivery_to_date = self.request.query_params.get('order_to_date', None)
+        if status:
+            queryset = queryset.filter(status__icontains=status)
+        if order_from_date and order_to_date:
+            queryset = queryset.filter(order_date__gte=order_from_date, order_date__lte=order_to_date)
+        if delivery_from_date and delivery_to_date:
+            queryset = queryset.filter(delivery_date__gte=delivery_from_date, delivery_date__lte=delivery_to_date)
+        return queryset
