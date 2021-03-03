@@ -81,7 +81,7 @@ class LoginView(APIView):
                 return Response({
                     'token': token.key,
                     'user': profile,
-                    'merchant_list': merchant_list,
+                    'user_permission': merchant_list,
 
                 }, )
 
