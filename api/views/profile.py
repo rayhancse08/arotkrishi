@@ -15,13 +15,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserProfile
         fields = (
-            'id',
+            # 'id',
             'name',
             'address',
             'email',
             'profile_picture',
             'phone_number',
-            'initial_balance',
+            # 'initial_balance',
         )
 
 
@@ -62,3 +62,48 @@ class UserSerializer(serializers.ModelSerializer):
                   'profile_picture',
                   'phone_number',
                   )
+
+
+class ProfileViewSet(viewsets.GenericViewSet):
+    serializer_class = UserProfileSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request):
+        """ Get currently logged in users profile. """
+        return Response({
+            'data': UserProfileSerializer(request.user.profile).data
+        })
+
+    def update(self, request, *args, **kwargs):
+        """ Update currently logged in users profile. """
+        partial = kwargs.pop('partial', False)
+        name = request.data.get('name', None)
+        phone_number = request.data.get('phone_number', None)
+
+        if not name:
+            raise serializers.ValidationError({'name': 'Name should not empty'})
+        if not phone_number:
+            raise serializers.ValidationError({'phone_number': 'Phone number should not empty'})
+
+        profile_data = UserProfileSerializer(
+            data=request.data,
+            instance=request.user.profile,
+            partial=partial
+        )
+
+        if profile_data.is_valid():
+            profile_data.save(user=request.user)
+            response = {'success': {
+                'message': 'Profile updated successfully'
+            }}
+
+            if not partial:
+                response['data'] = UserProfileSerializer(request.user.profile).data
+
+            return Response(response, status=status.HTTP_200_OK)
+
+        response = {'error': profile_data.errors}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
