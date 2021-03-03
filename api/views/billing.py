@@ -14,7 +14,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class BillingSerializer(serializers.ModelSerializer):
-    order = OrderSerializer(many=False,read_only=True)
+    order = OrderSerializer(many=False, read_only=True)
 
     class Meta:
         model = Billing
@@ -41,11 +41,12 @@ class BillingUpdateSerializer(serializers.ModelSerializer):
         )
 
 
-class BillingViewSet(mixins.UpdateModelMixin,
+class BillingViewSet(MultiSerializerMixin,
+                     mixins.UpdateModelMixin,
                      GenericViewSet,
                      mixins.RetrieveModelMixin,
                      mixins.ListModelMixin,
-                     MultiSerializerMixin,
+
                      ):
     serializer_class = BillingSerializer
 
