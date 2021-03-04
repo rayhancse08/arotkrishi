@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from api import urls as api_urls
 from django.views.generic.base import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 class HomeView(TemplateView):
@@ -54,8 +56,11 @@ class LoginView(TemplateView):
 class OrderView(TemplateView):
     template_name = 'index.html'
 
+
 class BillingView(TemplateView):
     template_name = 'index.html'
+
+
 urlpatterns = [
     path('', HomeView.as_view()),
     path('about/', AboutView.as_view()),
@@ -66,8 +71,10 @@ urlpatterns = [
     path('contact/', ContactView.as_view()),
     path('login/', LoginView.as_view()),
     path('order', OrderView.as_view()),
-    path('billing',BillingView.as_view()),
+    path('billing', BillingView.as_view()),
 
     path('admin/', admin.site.urls),
     path('api/', include(api_urls)),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -24,6 +24,14 @@ class BillingSerializer(serializers.ModelSerializer):
             'amount',
             'status',
             'received',
+            'payment_date',
+            'bank_name',
+            'branch_name',
+            'check_no',
+            'check_date',
+            'payment_type',
+            'partial_amount',
+            'attachment',
         )
 
 
@@ -34,10 +42,13 @@ class BillingUpdateSerializer(serializers.ModelSerializer):
         model = Billing
         fields = (
             'id',
-            # 'order',
-            # 'amount',
-            'status',
-            # 'received',
+            'bank_name',
+            'branch_name',
+            'check_no',
+            'check_date',
+            'payment_type',
+            'partial_amount',
+            'attachment',
         )
 
 
