@@ -6,14 +6,13 @@ from api.views.utils import MultiSerializerMixin
 from rest_framework import generics
 from rest_framework.utils import model_meta
 from django.utils.timezone import localtime, now
+from api.views.order import OrderSerializer
 
-
-# from api.views.order import OrderSerializer
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ('id',
-                  'order_no')
+# class OrderSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Order
+#         fields = ('id',
+#                   'order_no')
 
 
 class BillingSerializer(serializers.ModelSerializer):
