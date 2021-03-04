@@ -1,6 +1,6 @@
 from django.urls import path, include
 from api.views import ProductViewSet, LogoutView, LoginView, OrderViewSet, OrderSearchView, \
-    MerchantUserPermissionViewSet, ChangePasswordView, BillingViewSet, ProfileViewSet
+    MerchantUserPermissionViewSet, ChangePasswordView, BillingViewSet, ProfileViewSet, BillingSearchView
 from api.views.order import cancel_order, confirm_order
 from rest_framework import routers
 
@@ -16,6 +16,7 @@ urlpatterns = [
     path('orders/<order_id>/cancel/', cancel_order),
     path('orders/<order_id>/confirm/', confirm_order),
     path('orders/search', OrderSearchView.as_view()),
+    path('billing/search', BillingSearchView.as_view()),
     path('change_password/', ChangePasswordView.as_view()),
     path('profile/', ProfileViewSet.as_view({
         'get': 'list',
