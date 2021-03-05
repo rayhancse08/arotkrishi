@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 import uuid
 from api.views.profile import UserSerializer
 
+
 # from rest_framework.response import Response
 # from rest_framework.views import APIView
 # from rest_framework import generics
@@ -79,23 +80,23 @@ class MerchantPermissionCreateUpdateSerializer(serializers.ModelSerializer):
         # user = self.context.get("user")
         # if not user:
         if not name:
-                raise serializers.ValidationError({"error": "Name required"})
+            raise serializers.ValidationError({"error": "Name required"})
 
         if not phone_number:
-                raise serializers.ValidationError({"error": "Phone number required"})
+            raise serializers.ValidationError({"error": "Phone number required"})
 
         if not password:
-                raise serializers.ValidationError({"error": "Password required"})
+            raise serializers.ValidationError({"error": "Password required"})
 
         if password != confirm_password:
-                raise serializers.ValidationError({"error": "Password not match"})
+            raise serializers.ValidationError({"error": "Password not match"})
         user_profile = UserProfile.objects.filter(phone_number=phone_number).exists()
         if user_profile:
-                raise serializers.ValidationError({"error": "User already exists"})
+            raise serializers.ValidationError({"error": "User already exists"})
         user = User.objects.create_user(
-                username=str(uuid.uuid4()),
-                password=password
-            )
+            username=str(uuid.uuid4()),
+            password=password
+        )
         profile = UserProfile(user=user)
         profile.name = name
         profile.phone_number = phone_number
