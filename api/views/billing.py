@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Billing, Order
+from api.models import Billing, Merchant
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 from api.views.utils import MultiSerializerMixin
@@ -9,16 +9,35 @@ from django.utils.timezone import localtime, now
 from api.views.order import OrderSerializer
 from api.views.profile import UserListSerializer
 
+
 # class OrderSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Order
 #         fields = ('id',
 #                   'order_no')
 
+class BuyerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Merchant
+        fields = (
+            'id',
+            'name',
+
+            'phone_number',
+            'email',
+            'address',
+
+        )
+
 
 class BillingSerializer(serializers.ModelSerializer):
     order = OrderSerializer(many=False, read_only=True)
-    paid_by = UserListSerializer(many=False,read_only=True)
+    paid_by = UserListSerializer(many=False, read_only=True)
+    buyer = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_buyer(obj):
+        return BuyerSerializer(obj.order.buyer).data
 
     class Meta:
         model = Billing
@@ -37,6 +56,7 @@ class BillingSerializer(serializers.ModelSerializer):
             'partial_amount',
             'attachment',
             'paid_by',
+            'buyer',
         )
 
 
