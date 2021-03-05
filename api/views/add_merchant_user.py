@@ -6,7 +6,7 @@ from api.views.utils import MultiSerializerMixin
 # from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 import uuid
-
+from api.views.profile import UserSerializer
 
 # from rest_framework.response import Response
 # from rest_framework.views import APIView
@@ -49,7 +49,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id',
                   'name',
-                  'phone_number',)
+                  'phone_number',
+                  'email',
+                  'address',
+                  'profile_picture')
         # 'code',
         # 'country_code',
         # 'national_number')
@@ -138,7 +141,7 @@ class MerchantSerializer(serializers.ModelSerializer):
 
 
 class MerchantPermissionSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()
+    user = UserSerializer()
     merchant = MerchantSerializer()
 
     class Meta:
