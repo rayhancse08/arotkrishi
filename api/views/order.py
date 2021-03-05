@@ -12,6 +12,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.utils import model_meta
 from rest_framework.decorators import api_view
+from api.views.profile import UserListSerializer
 
 
 class MerchantSerializer(serializers.ModelSerializer):
@@ -135,7 +136,9 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
 
         instance.clean()
         instance.save()
-
+        if instance.status == 'Confirmed':
+            instance.confirmed_by = self.context.get("user")
+            instance.save()
         return instance
 
     class Meta:
@@ -157,8 +160,8 @@ class OrderCreateUpdateSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, required=False)
     buyer = MerchantSerializer(many=False)
-    # status = serializers.SerializerMethodField()
-    # status = serializers.CharField(source='get_status_display')
+    created_by = UserListSerializer(many=False, read_only=True)
+    confirmed_by = UserListSerializer(many=False, read_only=True)
 
     class Meta:
         model = Order
@@ -171,7 +174,9 @@ class OrderSerializer(serializers.ModelSerializer):
             'status',
             'created_by',
             'order_items',
-            'created'
+            'created',
+            'created_by',
+            'confirmed_by'
 
         )
 

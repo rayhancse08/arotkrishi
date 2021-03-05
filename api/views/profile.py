@@ -7,6 +7,21 @@ from django.contrib.auth.models import User
 from rest_framework import generics
 
 
+class UserListSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_name(obj):
+        return obj.profile.name
+
+    class Meta:
+        model = User
+        fields = ('id',
+                  'name',
+
+                  )
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     # @staticmethod
     # def get_id(obj):
@@ -31,6 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
     profile_picture = serializers.SerializerMethodField()
     phone_number = serializers.SerializerMethodField()
+
     @staticmethod
     def get_name(obj):
         return obj.profile.name
@@ -104,6 +120,3 @@ class ProfileViewSet(viewsets.GenericViewSet):
 
         response = {'error': profile_data.errors}
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-
-

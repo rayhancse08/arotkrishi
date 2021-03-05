@@ -19,6 +19,8 @@ class Order(models.Model):
     buyer = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='orders')
     status = models.CharField(choices=ORDER_STATUS, default='Proposed', max_length=20)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    confirmed_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='confirmed_orders', null=True,
+                                     blank=True)
     total_amount = models.DecimalField(
         null=True,
         blank=True,

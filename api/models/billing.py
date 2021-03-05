@@ -1,5 +1,6 @@
 from django.db import models
 from api.models import Order
+from django.contrib.auth.models import User
 
 
 class Billing(models.Model):
@@ -21,5 +22,6 @@ class Billing(models.Model):
                                          )
     attachment = models.ImageField(null=True, blank=True)
     received = models.BooleanField(default=False)
+    paid_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='billings', null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True, null=True)

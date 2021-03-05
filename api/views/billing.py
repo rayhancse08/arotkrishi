@@ -7,6 +7,7 @@ from rest_framework import generics
 from rest_framework.utils import model_meta
 from django.utils.timezone import localtime, now
 from api.views.order import OrderSerializer
+from api.views.profile import UserListSerializer
 
 # class OrderSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -17,6 +18,7 @@ from api.views.order import OrderSerializer
 
 class BillingSerializer(serializers.ModelSerializer):
     order = OrderSerializer(many=False, read_only=True)
+    paid_by = UserListSerializer(many=False,read_only=True)
 
     class Meta:
         model = Billing
@@ -34,15 +36,17 @@ class BillingSerializer(serializers.ModelSerializer):
             'payment_type',
             'partial_amount',
             'attachment',
+            'paid_by',
         )
 
 
 class BillingUpdateSerializer(serializers.ModelSerializer):
     # order = OrderSerializer(many=False)
     def update(self, instance, validated_data):
-        bank_name = validated_data.get('bank_name',None)
+        bank_name = validated_data.get('bank_name', None)
         if not instance.payment_date and bank_name:
             instance.payment_date = localtime().date()
+            instance.paid_by = self.context.get("user")
         info = model_meta.get_field_info(instance)
         for attr, value in validated_data.items():
             if attr in info.relations and info.relations[attr].to_many:
@@ -83,6 +87,11 @@ class BillingViewSet(MultiSerializerMixin,
         # store = self.request.META.get('HTTP_STORE_ID', None)
         qs = Billing.objects.filter(order__buyer=merchant)
         return qs
+
+    def get_serializer_context(self):
+        context = super(BillingViewSet, self).get_serializer_context()
+        context['user'] = self.request.user
+        return context
 
     serializer_action_classes = {
         'list': BillingSerializer,
