@@ -76,30 +76,30 @@ class MerchantPermissionCreateUpdateSerializer(serializers.ModelSerializer):
         read_permission = validated_data.get('read_permission', None)
         # store = Store.objects.get(id=int(self.context.get("store_id")))
         merchant = self.context.get("user").merchant_user_permissions.first().merchant
-        user = self.context.get("user")
-        if not user:
-            if not name:
+        # user = self.context.get("user")
+        # if not user:
+        if not name:
                 raise serializers.ValidationError({"error": "Name required"})
 
-            if not phone_number:
+        if not phone_number:
                 raise serializers.ValidationError({"error": "Phone number required"})
 
-            if not password:
+        if not password:
                 raise serializers.ValidationError({"error": "Password required"})
 
-            if password != confirm_password:
+        if password != confirm_password:
                 raise serializers.ValidationError({"error": "Password not match"})
-            user_profile = UserProfile.objects.filter(phone_number=phone_number).exists()
-            if user_profile:
+        user_profile = UserProfile.objects.filter(phone_number=phone_number).exists()
+        if user_profile:
                 raise serializers.ValidationError({"error": "User already exists"})
-            user = User.objects.create_user(
+        user = User.objects.create_user(
                 username=str(uuid.uuid4()),
                 password=password
             )
-            profile = UserProfile(user=user)
-            profile.name = name
-            profile.phone_number = phone_number
-            profile.save()
+        profile = UserProfile(user=user)
+        profile.name = name
+        profile.phone_number = phone_number
+        profile.save()
         if MerchantPermission.objects.filter(user=user, merchant=merchant).exists():
             raise serializers.ValidationError({"error": "User already exists on this store"})
 
