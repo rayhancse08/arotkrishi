@@ -70,8 +70,9 @@ urlpatterns = [
     path('team/', TeamView.as_view()),
     path('contact/', ContactView.as_view()),
     path('login/', LoginView.as_view()),
-    path('order', OrderView.as_view()),
-    path('billing', BillingView.as_view()),
+    path('order/', OrderView.as_view()),
+    path('billing/', BillingView.as_view()),
+    path('profile/', HomeView.as_view()),
 
     path('admin/', admin.site.urls),
     path('api/', include(api_urls)),

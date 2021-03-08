@@ -193,6 +193,8 @@ class OrderViewSet(
 
     parser_classes = (JSONParser, MultipartJsonParser)
 
+    # paginate_by = 2
+
     def get_queryset(self):
         merchant = self.request.user.merchant_user_permissions.first().merchant
         qs = Order.objects.filter(buyer=merchant)
