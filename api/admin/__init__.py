@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
-from api.models import UserProfile, Merchant, Product, Order,Billing
+from api.models import UserProfile, Merchant, Product, Order,Billing,Payment
 from api.admin.GenericModelAdmin import GenericModelAdmin
 from api.admin.UserProfileAdmin import UserProfileAdmin
 from api.admin.MerchantAdmin import MerchantAdmin

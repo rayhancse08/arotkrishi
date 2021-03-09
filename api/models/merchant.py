@@ -30,10 +30,15 @@ class Merchant(models.Model):
 
 
 class MerchantPermission(models.Model):
+    USER_TYPE = (('procurement', 'Procurement'),
+                 ('store manager', 'Store Manager'),
+                 ('accounts', 'Accounts'),)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='merchant_user_permissions', null=True,
                              blank=True)
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='merchant_permissions', null=True,
                                  blank=True)
+    user_type = models.CharField(choices=USER_TYPE, max_length=20, default='procurement')
+    active = models.BooleanField(default=True)
     owner = models.BooleanField(default=False)
     create_permission = models.BooleanField(default=False)
     read_permission = models.BooleanField(default=False)
