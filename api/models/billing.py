@@ -30,6 +30,7 @@ class Payment(models.Model):
     partial_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     attachment = models.ImageField(null=True, blank=True)
     received = models.BooleanField(default=False)
-    paid_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='billings', null=True, blank=True)
+    paid_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='paid_payments', null=True, blank=True)
+    received_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_payments', null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True, null=True)
