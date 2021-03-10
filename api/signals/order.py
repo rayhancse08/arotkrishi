@@ -13,5 +13,5 @@ def update_purchase_total_price(sender, instance, created=None, *args, **kwargs)
 @receiver(post_save, sender=Order)
 @receiver(post_delete, sender=Order)
 def add_billing(sender, instance, created=None, *args, **kwargs):
-    if instance.status == 'Delivered' and not instance.billings.exists():
+    if instance.status == 'Delivered' and not Billing.objects.filter(order=instance).exists():
         Billing.objects.create(order=instance, amount=instance.total_amount)

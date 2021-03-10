@@ -44,6 +44,7 @@ class MerchantPermissionSerializer(serializers.ModelSerializer):
             'read_permission',
             'delete_permission',
             'owner',
+            'user_type',
 
         )
 
