@@ -7,6 +7,7 @@ from api.views.utils import MultiSerializerMixin
 from django.contrib.auth.models import User
 import uuid
 from api.views.profile import UserSerializer
+from rest_framework.utils import model_meta
 
 
 # from rest_framework.response import Response
@@ -31,21 +32,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_phone_number(obj):
         return obj.profile.phone_number
 
-    # @staticmethod
-    # def get_code(obj):
-    #     pn = phonenumbers.parse(obj.profile.phone_number)
-    #     return region_code_for_country_code(pn.country_code)
-    #
-    # @staticmethod
-    # def get_national_number(obj):
-    #     pn = phonenumbers.parse(obj.profile.phone_number)
-    #     return pn.national_number
-    #
-    # @staticmethod
-    # def get_country_code(obj):
-    #     pn = phonenumbers.parse(obj.profile.phone_number)
-    #     return "+{}".format(pn.country_code)
-
     class Meta:
         model = User
         fields = ('id',
@@ -54,9 +40,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
                   'email',
                   'address',
                   'profile_picture')
-        # 'code',
-        # 'country_code',
-        # 'national_number')
 
 
 class MerchantPermissionCreateUpdateSerializer(serializers.ModelSerializer):
@@ -64,8 +47,11 @@ class MerchantPermissionCreateUpdateSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=50, required=False)
     password = serializers.CharField(max_length=50, required=False)
     confirm_password = serializers.CharField(max_length=50, required=False)
+    address = serializers.CharField(max_length=100, required=False)
+    email = serializers.CharField(max_length=50, required=False)
 
-    def create(self, validated_data):
+    @staticmethod
+    def create_update_merchant_permission(validated_data, user, update=False):
         phone_number = validated_data.get('phone_number', None)
         name = validated_data.get('name', None)
         password = validated_data.get('password', None)
@@ -75,41 +61,74 @@ class MerchantPermissionCreateUpdateSerializer(serializers.ModelSerializer):
         update_permission = validated_data.get('update_permission', None)
         delete_permission = validated_data.get('delete_permission', None)
         read_permission = validated_data.get('read_permission', None)
-        # store = Store.objects.get(id=int(self.context.get("store_id")))
-        merchant = self.context.get("user").merchant_user_permissions.first().merchant
-        # user = self.context.get("user")
-        # if not user:
+        address = validated_data.get('address', None)
+        email = validated_data.get('email', None)
+
+        merchant = user.merchant_user_permissions.first().merchant
         if not name:
             raise serializers.ValidationError({"error": "Name required"})
 
         if not phone_number:
             raise serializers.ValidationError({"error": "Phone number required"})
 
-        if not password:
+        if not password and not update:
             raise serializers.ValidationError({"error": "Password required"})
 
-        if password != confirm_password:
+        if password != confirm_password and not update:
             raise serializers.ValidationError({"error": "Password not match"})
         user_profile = UserProfile.objects.filter(phone_number=phone_number).exists()
         if user_profile:
-            raise serializers.ValidationError({"error": "User already exists"})
-        user = User.objects.create_user(
-            username=str(uuid.uuid4()),
-            password=password
-        )
-        profile = UserProfile(user=user)
-        profile.name = name
-        profile.phone_number = phone_number
-        profile.save()
-        if MerchantPermission.objects.filter(user=user, merchant=merchant).exists():
-            raise serializers.ValidationError({"error": "User already exists on this store"})
+            profile = UserProfile.objects.filter(phone_number=phone_number).first()
+            profile.name = name
+            profile.phone_number = phone_number
+            profile.address = address
+            profile.email = email
+            profile.save()
 
-        merchant_permission = MerchantPermission(user=user, create_permission=create_permission,
-                                                 update_permission=update_permission,
-                                                 delete_permission=delete_permission, read_permission=read_permission,
-                                                 merchant=merchant)
-        merchant_permission.save()
+            # raise serializers.ValidationError({"error": "User already exists"})
+        else:
+            user = User.objects.create_user(
+                username=str(uuid.uuid4()),
+                password=password
+            )
+            profile = UserProfile(user=user)
+            profile.name = name
+            profile.phone_number = phone_number
+            profile.address = address
+            profile.email = email
+            profile.save()
+        if MerchantPermission.objects.filter(user=user, merchant=merchant).exists():
+            # raise serializers.ValidationError({"error": "User already exists on this store"})
+            merchant_permission = MerchantPermission.objects.filter(user=user, merchant=merchant).first()
+            merchant_permission.user_type = validated_data.get('user_type', None)
+        else:
+            merchant_permission = MerchantPermission(user=user, create_permission=create_permission,
+                                                     update_permission=update_permission,
+                                                     delete_permission=delete_permission,
+                                                     read_permission=read_permission,
+                                                     merchant=merchant)
+            merchant_permission.save()
         return merchant_permission
+
+    def create(self, validated_data):
+        merchant_permission = self.create_update_merchant_permission(validated_data, user=self.context.get("user"))
+
+        return merchant_permission
+
+    def update(self, instance, validated_data):
+        merchant_permission = self.create_update_merchant_permission(validated_data, user=self.context.get("user"),
+                                                                     update=True)
+
+        return merchant_permission
+        # info = model_meta.get_field_info(instance)
+        # for attr, value in validated_data.items():
+        #     if attr in info.relations and info.relations[attr].to_many:
+        #         field = getattr(instance, attr)
+        #         field.set(value)
+        #     else:
+        #         setattr(instance, attr, value)
+        # instance.clean()
+        # instance.save()
 
     class Meta:
         model = MerchantPermission
@@ -120,7 +139,6 @@ class MerchantPermissionCreateUpdateSerializer(serializers.ModelSerializer):
             'user': {'required': False},
         }
         fields = (
-            # 'user',
             'phone_number',
             'name',
             'password',
@@ -129,6 +147,10 @@ class MerchantPermissionCreateUpdateSerializer(serializers.ModelSerializer):
             'update_permission',
             'delete_permission',
             'read_permission',
+            'user_type',
+            'email',
+            'address',
+
         )
 
 
