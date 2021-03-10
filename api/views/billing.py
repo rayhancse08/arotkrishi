@@ -111,7 +111,7 @@ class BillingUpdateSerializer(serializers.ModelSerializer):
     def create_update_payments(payments_data, billing, user):
         payment_id_list = []
         for payment in payments_data:
-            print(payment)
+            # print(payment)
             payment_id = payment.get('payment_id', None)
             bank_name = payment.get('bank_name', None)
             branch_name = payment.get('branch_name', None)
@@ -120,7 +120,7 @@ class BillingUpdateSerializer(serializers.ModelSerializer):
             payment_type = payment.get('payment_type', None)
             partial_amount = payment.get('partial_amount', None)
             attachment = payment.get('attachment', None)
-            print(payment_id)
+            # print(payment_id)
             if payment_id:
                 payment_instance = Payment.objects.get(id=payment_id)
                 payment_instance.bank_name = bank_name
