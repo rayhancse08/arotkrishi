@@ -13,12 +13,6 @@ from api.views.utils import MultipartJsonParser
 from rest_framework.parsers import JSONParser
 
 
-# class OrderSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Order
-#         fields = ('id',
-#                   'order_no')
-
 class BuyerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchant
@@ -202,7 +196,7 @@ class BillingViewSet(MultiSerializerMixin,
         'list': BillingSerializer,
         'retrieve': BillingSerializer,
         # 'create': OrderCreateUpdateSerializer,
-        'update': BillingUpdateSerializer,
+        # 'update': BillingUpdateSerializer,
     }
 
 
