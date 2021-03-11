@@ -72,9 +72,11 @@ class PaymentViewSet(MultiSerializerMixin,
                      GenericViewSet,
                      mixins.RetrieveModelMixin,
                      mixins.ListModelMixin,
+                     mixins.CreateModelMixin,
 
                      ):
     serializer_class = PaymentSerializer
+
     # lookup_field = 'order_id'
     # parser_classes = (JSONParser, MultipartJsonParser)
 
